@@ -1,0 +1,19 @@
+name: intactness
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+  - openssl==3.5.1
+  - ca-certificates
+  - certifi
+  - requests
+  - biopython
+  - lxml
+  - reportlab
+  - mechanicalsoup==0.11.0
+  - muscle
+  - scipy
+  - pypdf2
+  - blast
+prefix: /Users/rinkideo/miniforge3/envs/intactness
