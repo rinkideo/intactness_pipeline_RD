@@ -5,3 +5,6 @@
 .ipynb_checkpoints/
 
 .DS_Store
+
+# Conda / virtual environments
+miniforge_env/
