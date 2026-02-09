@@ -10,6 +10,8 @@
 miniforge_env/
 intactness/backup/
 
+.idea/
+
 # R session / IDE files
 .RData
 .Rhistory
