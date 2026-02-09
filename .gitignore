@@ -17,3 +17,8 @@ intactness/backup/
 .Rhistory
 .Rapp.history
 
+# JetBrains
+.idea/
+**/.idea/
+
+
