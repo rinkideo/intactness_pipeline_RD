@@ -9,3 +9,9 @@
 # Conda / virtual environments
 miniforge_env/
 intactness/backup/
+
+# R session / IDE files
+.RData
+.Rhistory
+.Rapp.history
+
