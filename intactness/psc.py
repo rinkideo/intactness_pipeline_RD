@@ -43,21 +43,6 @@ def psc(configs, seqs):
         submit_GC(configs['email'], configs['path_out'])  #RD
         process_GC(configs['path_out'])  #RD
 
-#     for gene in ['Gag', 'Pol', 'Env']:
-        
-        
-#         file_aln = configs['path_out'] + \
-#            '/Gene_Cutter/{}.aa.fasta'.format(gene)
-        
-#         continue
-
-#         try:
-#             f_size = os.path.getsize(file_aln)
-#         except OSError:
-#             continue
-
-#         if f_size == 0:
-#             continue
             
         ##MODIFIED BY RD
         #########################

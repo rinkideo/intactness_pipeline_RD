@@ -23,8 +23,7 @@ zip_path_default = 'data/seqs/genecutter.zip'  #RD
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# pylint: disable=C0103
-# Invalid constant name
+
 logger = logging.getLogger('pipe.GeneCutter')
 
 URL_BASE = "https://www.hiv.lanl.gov/"
@@ -97,40 +96,6 @@ def submit_GC(email_address, path_out='data/seqs'):  #RD
 
     url_download = f'https://www.hiv.lanl.gov/cgi-bin/common_code/download.cgi?/tmp/GENE_CUTTER/{job_id}/genecutter.zip'
     url_all = f'https://www.hiv.lanl.gov/tmp/GENE_CUTTER/{job_id}/all_aa.html'
-    
-#     # Check the result availability
-
-#     while True:
-#         sleep_btw(60, 61)
-#         response = br.get(url_download, verify=False)
-#         time.sleep(5)
-
-#         if b'Request Rejected' not in response.content:
-#             with open(zip_path, 'wb') as fh:
-#                 fh.write(response.content)
-
-#             for attempt in range(10):  # Try for ~10 minutes
-#                 try:
-#                     with zipfile.ZipFile(zip_path, 'r') as fnz:
-#                         fnz.extractall('data/seqs/')
-#                     break  # Extraction success
-#                 except zipfile.BadZipFile:
-#                     print(f"Attempt {attempt + 1}: ZIP not valid yet, retrying in 60 seconds...")
-#                     time.sleep(60)
-#             else:
-#                 raise RuntimeError("ZIP file is still invalid after multiple retries.")
-
-#         # Success: continue post-processing
-#             os.rename('data/seqs/genecutter', 'data/seqs/Gene_Cutter')
-#             os.mkdir('data/seqs/Gene_Cutter/indv_reports')
-
-#             response = br.get(url_all, verify=False)
-#             with open('data/seqs/Gene_Cutter/ALL.AA.PRINT', 'w') as out:
-#                 content = re.sub(r'<br>', '\n', response.content.decode())
-#                 content = re.sub(r'<.*?>', '', content)
-#                 out.write(content)
-
-#             break  # Exit main loop after everything succeeded
 
 # Check the result availability
     zip_path = os.path.join(path_out, 'genecutter.zip')  #RD
