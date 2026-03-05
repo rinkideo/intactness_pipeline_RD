@@ -1,21 +1,20 @@
-Intactness Pipeline
+# Intactness Pipeline
 
-Part 1: For coders (Miniforge / Conda)
+## Part 1: For coders (Miniforge / Conda)
 
 Quick start
 - Create env: `conda env create -f environment.yml`
 - Activate: `conda activate intactness`
 - Run (default input `data/seqs.fasta`): `python -m intactness`
 - Run with custom input: `python -m intactness --input data/yourfile.fasta`
-- Plasmidsaurus run (force primer=Yes): `python -m intactness --plasmid --input data/yourfile.fasta`
+- Plasmidsaurus run: `python -m intactness --plasmid --input data/yourfile.fasta`
 
-Part 2: For non-coders (Docker)
+## Part 2: For non-coders (Docker)
 
 This section is for users who do not use Python/Conda.
 You only need Docker Desktop and a Terminal.
 
 Before you start
-- Ask the project owner to build the Docker image once and share the image name.
 - Keep your folders like this:
   - `intactness_pipeline_RD/data` (input FASTA and outputs)
   - `intactness_pipeline_RD/database` (reference files)
@@ -42,11 +41,6 @@ How to know it worked
 - Terminal ends with: `Pipeline finished. Good bye!`
 - Output files are created in `data/seqs` or `data/seqs_<inputname>`.
 
-If something fails
-- Check Docker Desktop is running.
-- Make sure file paths are correct (especially input FASTA path).
-- Make sure `database/R_HXB2.fasta` exists.
-
 Inputs
 - Unaligned FASTA contigs
 - Headers should be unique and contain no spaces
@@ -60,9 +54,4 @@ Key behavior
 - GeneCutter is skipped if `summary_psc.tsv` already exists in the output folder
 
 External dependencies
-- `blastn` must be available on PATH (provided by conda env / Docker image)
-- MUSCLE binary should be available on PATH (`muscle`)
 - GeneCutter requires internet access
-
-Notes
-- Thresholds and cutoffs are defined in `default.cfg`
