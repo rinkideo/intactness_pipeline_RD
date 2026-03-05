@@ -20,7 +20,6 @@ Before you start
   - `intactness_pipeline_RD/database` (reference files)
   - `intactness_pipeline_RD/intactness` (pipeline scripts)
 
-Step-by-step
 1. Open Docker Desktop and wait until it says it is running.
 2. Open Terminal.
 3. Go to the project root folder:
