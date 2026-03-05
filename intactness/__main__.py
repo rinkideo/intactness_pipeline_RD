@@ -11,6 +11,7 @@ Created on Mon Mar 27 00:29:42 2017
 import argparse  #RD
 import sys
 import logging
+import datetime
 
 # Local module
 from .view import View
@@ -48,6 +49,22 @@ if args.input_fasta:  #RD
     os.makedirs(cfg['Main']['path_out'], exist_ok=True)  #RD
 if args.plasmid:  #RD
     cfg['Primer']['plasmidsaurus_force_primer'] = '1'  #RD
+
+# Logging: initialize handlers after final output path is resolved.
+os.makedirs(cfg['Main']['path_out'], exist_ok=True)
+date_tag = datetime.datetime.now().strftime("%Y-%b-%d_%H-%M-%S")
+file_log = "{}/run_{}.log".format(cfg['Main']['path_out'], date_tag)
+fmtr = logging.Formatter('%(asctime)s\t\t%(name)s\t\t%(message)s')
+
+fh = logging.FileHandler(file_log)
+fh.setLevel(logging.INFO)
+fh.setFormatter(fmtr)
+logger.addHandler(fh)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+ch.setFormatter(fmtr)
+logger.addHandler(ch)
 
 seqs = Sequences(cfg['Query'], cfg['Reference'])
 

@@ -48,6 +48,13 @@ How to know it worked
 - Terminal ends with: `Pipeline finished. Good bye!`
 - Output files are created in `data/seqs` or `data/seqs_<inputname>`.
 
+If MUSCLE fails (non-coder fix)
+1. Stop the run and open Docker Desktop.
+2. Go to `Settings` -> `Resources`.
+3. Increase `Memory` to `16 GB` (minimum `12 GB`), then click `Apply & Restart`.
+4. Run the same command again.
+5. If it still fails, use a smaller input FASTA file (split into smaller files).
+
 Inputs
 - Unaligned FASTA contigs
 - Headers should be unique and contain no spaces

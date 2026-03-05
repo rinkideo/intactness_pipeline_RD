@@ -8,6 +8,7 @@ Perform Hypermutation analysis based on Hypermut v2.0
 
 import re
 import logging
+import subprocess
 
 from Bio import SeqIO
 from scipy.stats import fisher_exact
@@ -98,12 +99,16 @@ def _hyper_drop(file_ref, file_drop, seqs):
     # Run HypermutShort
     import tempfile
     fh_out = tempfile.NamedTemporaryFile(delete=False)
-    from Bio.Blast.Applications import NcbiblastnCommandline
-    cline = NcbiblastnCommandline(out=fh_out.name, query=file_drop,
-                                  db=file_ref, outfmt=5,
-                                  max_hsps=1, task='blastn')
-
-    cline()
+    cmd = [
+        'blastn',
+        '-query', file_drop,
+        '-db', file_ref,
+        '-out', fh_out.name,
+        '-outfmt', '5',
+        '-max_hsps', '1',
+        '-task', 'blastn',
+    ]
+    subprocess.run(cmd, check=True)
     from Bio.Blast import NCBIXML
     blast_records = NCBIXML.parse(open(fh_out.name))
 

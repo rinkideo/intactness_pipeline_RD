@@ -171,9 +171,7 @@ def _call_del_inv(seqs, hits, min_aln_len, min_aln_len_no_primer):
     """Call large deletion and inversion based on blast reulsts"""
 
     for qid in seqs.qids:
-        print('qid{} all'.format(qid)) ##
         if qid not in hits:
-            print('qid{} not in hits'.format(qid)) ##
             seqs.call[qid]['is_hiv'] = 'No'
             seqs.call[qid]['deletion'] = 'Pass'
             seqs.call[qid]['inversion'] = 'Pass'
@@ -207,7 +205,6 @@ def _call_del_inv(seqs, hits, min_aln_len, min_aln_len_no_primer):
 
                 # Assign selected seq to +/- categories
                 if aln_strand == 'plus':
-                    print('qid{} algn len gt min prim no'.format(qid)) ##
                     seqs.call[qid]['inversion'] = 'No'
                 elif aln_strand == 'minus':
                     seqs.call[qid]['inversion'] = 'No'
@@ -261,10 +258,7 @@ def _prepare_qseqs(seqs, file_keep, file_keep_plus_ref, file_drop):
     qids_keep_rev = set()
     qids_drop = set()
     for qid in seqs.qids:
-        print('qid{}  prep function'.format(qid)) ##
         _, _, _, aln_strand = seqs.info[qid]['blast']
-        print('aln_strand',aln_strand)##
-        print(seqs.call[qid])####
         if all([seqs.call[qid]['is_hiv'] == 'Yes',
                 seqs.call[qid]['deletion'] == 'No',
                 seqs.call[qid]['inversion'] == 'No']):

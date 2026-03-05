@@ -8,8 +8,8 @@ dependencies:
   - muscle
   - numpy
   - scipy
-  - biopython
-  - mechanicalsoup
+  - biopython=1.85
+  - mechanicalsoup=0.11
   - requests
   - beautifulsoup4
   - lxml
