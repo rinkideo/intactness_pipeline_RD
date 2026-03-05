@@ -54,18 +54,3 @@ If MUSCLE fails
 3. Increase `Memory` to `16 GB` (minimum `12 GB`), then click `Apply & Restart`.
 4. Run the same command again.
 5. If it still fails, use a smaller input FASTA file (split into smaller files).
-
-Inputs
-- Unaligned FASTA contigs
-- Headers should be unique and contain no spaces
-
-Outputs
-- Default output folder: `data/seqs`
-- With `--input data/foo.fasta`, output folder: `data/seqs_foo`
-
-Key behavior
-- MUSCLE alignment is skipped if the alignment file already exists at `MSA:file_aln`
-- GeneCutter is skipped if `summary_psc.tsv` already exists in the output folder
-
-External dependencies
-- GeneCutter requires internet access
