@@ -48,7 +48,7 @@ How to know it worked
 - Terminal ends with: `Pipeline finished. Good bye!`
 - Output files are created in `data/seqs` or `data/seqs_<inputname>`.
 
-If MUSCLE fails (non-coder fix)
+If MUSCLE fails
 1. Stop the run and open Docker Desktop.
 2. Go to `Settings` -> `Resources`.
 3. Increase `Memory` to `16 GB` (minimum `12 GB`), then click `Apply & Restart`.
