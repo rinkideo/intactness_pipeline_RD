@@ -20,11 +20,19 @@ Before you start
   - `intactness_pipeline_RD/database` (reference files)
   - `intactness_pipeline_RD/intactness` (pipeline scripts)
 
+
 1. Open Docker Desktop and wait until it says it is running.
 2. Open Terminal.
 3. Go to the project root folder:
    - `cd "/path/to/intactness_pipeline_RD"`
-4. Put your FASTA file inside `data/`.
+
+First-time setup (required for first run only)
+  Build image locally:
+   - `cd intactness`
+   - `docker build -t intactness:latest .`
+   - `cd ..`
+
+
 5. Run one of these commands:
 
 - Default input (`data/seqs.fasta`):
