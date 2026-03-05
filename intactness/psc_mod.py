@@ -33,15 +33,9 @@ def psc(configs, seqs):
                                      'Env': 'Pass'}
         return
 
-    seqs.write(os.path.join(configs['path_out'], 'seqs_psc.fasta'), psc_list)  #RD
-    path_psc = os.path.join(configs['path_out'], 'summary_psc.tsv')  #RD
-    use_existing_psc = os.path.exists(path_psc)  #RD
-    if use_existing_psc:  #RD
-        if not os.path.exists(path_psc):  #RD
-            raise FileNotFoundError(f"Missing summary_psc.tsv at {path_psc}")  #RD
-    else:  #RD
-        submit_GC(configs['email'], configs['path_out'])  #RD
-        process_GC(configs['path_out'])  #RD
+    seqs.write('data/seqs/seqs_psc.fasta', psc_list)
+    submit_GC(configs['email'])
+    process_GC()
 
 #     for gene in ['Gag', 'Pol', 'Env']:
         
@@ -86,18 +80,12 @@ def psc(configs, seqs):
 
         # Reference
         ref = next(recs)
-        #len_ref = len(ref.seq.ungap('-')) - 1
-        ##RD
-        len_ref = len(ref.seq.replace('-', '')) - 1
-        logger.debug(f"Reference sequence length (ungapped): {len_ref}")
-
+        len_ref = len(ref.seq.ungap('-')) - 1
 
         pos_start = int(configs[gene])
 
         for qry in recs:
-            # qry.id = qry.id.rstrip('_' + gene)  #RD original behavior (unsafe) #RD
-            if qry.id.endswith('_' + gene):  #RD
-                qry.id = qry.id[:-(len(gene) + 1)]  #RD
+            qry.id = qry.id.rstrip('_' + gene)
             cur_pos = 0  # Current ungapped position on ref
             num_ins = 0  # insertion
             num_del = 0  # deletion
@@ -126,9 +114,7 @@ def psc(configs, seqs):
                 msg = "Too many gaps in the last protein of {};".format(gene)
                 seqs.comments[qry.id] += msg
 
-            #len_qry = len(qry.seq.ungap('-'))
-            len_qry = len(qry.seq.replace('-', ''))
-
+            len_qry = len(qry.seq.ungap('-'))
             info = seqs.info[qry.id].setdefault('psc', {})
             fmt_str = "len({});iden({});mis({});ins({});del({})"
 
@@ -138,9 +124,6 @@ def psc(configs, seqs):
             if len_ref - len_qry >= 20:
                 seqs.comments[qry.id] += "Large Deletion on {};".format(gene)
 
-    for qid in seqs.qids:  #RD
-        seqs.info[qid].setdefault('psc', {'Gag': 'Pass', 'Pol': 'Pass', 'Env': 'Pass'})  #RD
-
     with open(configs['path_out'] + '/summary_psc.tsv') as fh_i:
         # Header
         fh_i.readline()
@@ -148,7 +131,11 @@ def psc(configs, seqs):
         for line in fh_i:
             qid, gene, psc_type, _ = line.rstrip().split('\t')
             seqs.call[qid]['psc'] = 'Yes'
-            seqs.info[qid]['psc'].setdefault(gene, 'Pass')  #RD
+            if 'psc' not in seqs.info[qid]:
+                seqs.info[qid]['psc'] = {}
+            if gene not in seqs.info[qid]['psc']:
+                seqs.info[qid]['psc'][gene] = 'Not evaluated'
+            
             seqs.info[qid]['psc'][gene] += ";{}".format(psc_type)
 
     for qid in seqs.qids:

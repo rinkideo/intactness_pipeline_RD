@@ -1,38 +1,68 @@
-# intactness_RD
-Taken from BWH-Lichterfeld-Lab / Intactness-Pipeline (https://github.com/BWH-Lichterfeld-Lab/Intactness-Pipeline)
+Intactness Pipeline
 
-Modification in Genecutter.py
-Added Line 51: 
-br['alwaysemail']='1'
+Part 1: For coders (Miniforge / Conda)
 
-Note:Insatll all libraries using Conda install
+Quick start
+- Create env: `conda env create -f environment.yml`
+- Activate: `conda activate intactness`
+- Run (default input `data/seqs.fasta`): `python -m intactness`
+- Run with custom input: `python -m intactness --input data/yourfile.fasta`
+- Plasmidsaurus run (force primer=Yes): `python -m intactness --plasmid --input data/yourfile.fasta`
 
-# Installation
+Part 2: For non-coders (Docker)
 
-The best way to manage the dependency of this repo is through a conda virtual
-environment. Use the following commands in your terminal
+This section is for users who do not use Python/Conda.
+You only need Docker Desktop and a Terminal.
 
-```
-conda create intactness python=3
-conda activate intactness
-conda install --file requirements.txt
-```
+Before you start
+- Ask the project owner to build the Docker image once and share the image name.
+- Keep your folders like this:
+  - `intactness_pipeline_RD/data` (input FASTA and outputs)
+  - `intactness_pipeline_RD/database` (reference files)
+  - `intactness_pipeline_RD/intactness` (pipeline scripts)
 
-Please check this [site](https://www.anaconda.com/) for information.
+Step-by-step
+1. Open Docker Desktop and wait until it says it is running.
+2. Open Terminal.
+3. Go to the project root folder:
+   - `cd "/path/to/intactness_pipeline_RD"`
+4. Put your FASTA file inside `data/`.
+5. Run one of these commands:
 
+- Default input (`data/seqs.fasta`):
+  - `docker run --rm -v "$PWD/data:/work/data" -v "$PWD/database:/work/database" intactness:latest`
 
-# Running instruction
+- Custom input:
+  - `docker run --rm -v "$PWD/data:/work/data" -v "$PWD/database:/work/database" intactness:latest --input data/yourfile.fasta`
 
-The whole repo is intended to be used as a template folder for reproducible
-research purpose. Please create a copy of this folder each time your run the
-pipeline.
+- Plasmidsaurus mode:
+  - `docker run --rm -v "$PWD/data:/work/data" -v "$PWD/database:/work/database" intactness:latest --plasmid --input data/yourfile.fasta`
 
-The following steps should be taken in order, in the root folder of the project.
+How to know it worked
+- Terminal ends with: `Pipeline finished. Good bye!`
+- Output files are created in `data/seqs` or `data/seqs_<inputname>`.
 
-1. Store the DNA sequences in a FASTA file named "seqs.fasta" in `data` folder
-1. Specify your email address on the 5th line in `intactness/default.cfg`
-1. `conda activate intactness`
-1. `python3 -m intactness`
-1. The result is in `data/seqs/summary.csv`
+If something fails
+- Check Docker Desktop is running.
+- Make sure file paths are correct (especially input FASTA path).
+- Make sure `database/R_HXB2.fasta` exists.
 
-For advanced users, the settings are stored in `intactness/default.cfg`.
+Inputs
+- Unaligned FASTA contigs
+- Headers should be unique and contain no spaces
+
+Outputs
+- Default output folder: `data/seqs`
+- With `--input data/foo.fasta`, output folder: `data/seqs_foo`
+
+Key behavior
+- MUSCLE alignment is skipped if the alignment file already exists at `MSA:file_aln`
+- GeneCutter is skipped if `summary_psc.tsv` already exists in the output folder
+
+External dependencies
+- `blastn` must be available on PATH (provided by conda env / Docker image)
+- MUSCLE binary should be available on PATH (`muscle`)
+- GeneCutter requires internet access
+
+Notes
+- Thresholds and cutoffs are defined in `default.cfg`

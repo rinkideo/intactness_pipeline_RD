@@ -17,7 +17,7 @@ from collections import defaultdict
 
 import os, certifi
 os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
-zip_path = 'data/seqs/genecutter.zip'
+zip_path_default = 'data/seqs/genecutter.zip'  #RD
 
 # Disable warning
 import urllib3
@@ -32,7 +32,7 @@ URL_BASE = "https://www.hiv.lanl.gov/"
 def sleep_btw(early, late):
     time.sleep(randrange(early, late))
 
-def submit_GC(email_address):
+def submit_GC(email_address, path_out='data/seqs'):  #RD
     """
     Submit aligned seqs to Gene Cutter and start the job
 
@@ -54,7 +54,7 @@ def submit_GC(email_address):
     ##RD
     br.select_form('form[action="/cgi-bin/GENE_CUTTER/gc.cgi"]')
     br['INSERTSTDSEQ'] = 'YES'
-    br['UPLOAD'] = 'data/seqs/seqs_psc.fasta'
+    br['UPLOAD'] = os.path.join(path_out, 'seqs_psc.fasta')  #RD
     br['alwaysemail'] = '1'
     br.session.verify = False
 
@@ -133,6 +133,7 @@ def submit_GC(email_address):
 #             break  # Exit main loop after everything succeeded
 
 # Check the result availability
+    zip_path = os.path.join(path_out, 'genecutter.zip')  #RD
     while True:
         sleep_btw(60, 61)
         try:
@@ -151,7 +152,7 @@ def submit_GC(email_address):
             for attempt in range(10):
                 try:
                     with zipfile.ZipFile(zip_path, 'r') as fnz:
-                        fnz.extractall('data/seqs/')
+                        fnz.extractall(path_out)  #RD
                     break
                 except zipfile.BadZipFile:
                     print(f"Attempt {attempt+1}: ZIP not valid yet, retrying in 60 seconds...")
@@ -161,14 +162,14 @@ def submit_GC(email_address):
     
             # Proceed after successful extraction
 
-            dst_path = 'data/seqs/Gene_Cutter'
+            dst_path = os.path.join(path_out, 'Gene_Cutter')  #RD
             if os.path.exists(dst_path):
                 shutil.rmtree(dst_path)  # removes existing directory and contents
-            os.rename('data/seqs/genecutter', dst_path)
-            os.mkdir('data/seqs/Gene_Cutter/indv_reports')
+            os.rename(os.path.join(path_out, 'genecutter'), dst_path)  #RD
+            os.mkdir(os.path.join(path_out, 'Gene_Cutter', 'indv_reports'))  #RD
     
             response = br.get(url_all, verify=False)
-            with open('data/seqs/Gene_Cutter/ALL.AA.PRINT', 'w') as out:
+            with open(os.path.join(path_out, 'Gene_Cutter', 'ALL.AA.PRINT'), 'w') as out:  #RD
                 content = re.sub(r'<br>', '\n', response.content.decode())
                 content = re.sub(r'<.*?>', '', content)
                 out.write(content)
@@ -185,12 +186,12 @@ def submit_GC(email_address):
     
     
     
-def process_GC():
+def process_GC(path_out='data/seqs'):  #RD
     # Parse results
     results = defaultdict(dict)
 
     gene_set = set(['Gag', 'Pol', 'Env'])
-    with open('data/seqs/Gene_Cutter/ALL.AA.PRINT') as fn:
+    with open(os.path.join(path_out, 'Gene_Cutter', 'ALL.AA.PRINT')) as fn:  #RD
         line = fn.readline()
         while line:
             if line.startswith('---------- List of Stop Codons Within Sequences'):
@@ -232,7 +233,7 @@ def process_GC():
                 line = fn.readline()
 
     if (len(results) == 0):
-        with open('data/seqs/summary_psc.tsv', 'w') as fn:
+        with open(os.path.join(path_out, 'summary_psc.tsv'), 'w') as fn:  #RD
             print('Contig\tRef\tType\tPSC', file=fn)
     else:
         final_results = defaultdict(dict)
@@ -253,7 +254,7 @@ def process_GC():
                     else:
                         final_results.setdefault(gene, {}).setdefault(contig, {}).setdefault(event[1], []).append((event[0], event[2]))
 
-        with open('data/seqs/summary_psc.tsv', 'w') as fn:
+        with open(os.path.join(path_out, 'summary_psc.tsv'), 'w') as fn:  #RD
             print('Contig\tRef\tType\tPSC', file=fn)
             # Remove beginning and ending
             for gene, contigs in final_results.items():

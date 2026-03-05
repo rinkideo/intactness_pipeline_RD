@@ -1,0 +1,19 @@
+name: intactness
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+  - blast=2.16
+  - muscle
+  - numpy
+  - scipy
+  - biopython
+  - mechanicalsoup
+  - requests
+  - beautifulsoup4
+  - lxml
+  - reportlab
+  - pillow
+  - pypdf2
+  - pip

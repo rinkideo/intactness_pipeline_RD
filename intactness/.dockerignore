@@ -1,0 +1,16 @@
+.git
+.gitignore
+.idea
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+*.swp
+*.swo
+.Rhistory
+.RData
+.ipynb_checkpoints
+*.ipynb
+backup/
+data/

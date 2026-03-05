@@ -32,6 +32,8 @@ def primer(configs, seqs):
     # Query data dict (qseqid -> SeqRecord)
     qry = seqs.qry
 
+    force_primer = str(configs.get('plasmidsaurus_force_primer', '0')) == '1'  #RD
+
     # Search primer sequences in all contigs
     for qseqid in qry:
         primers_found = []
@@ -44,6 +46,10 @@ def primer(configs, seqs):
             seqs.call[qseqid]['primer'] = "Yes"
         else:
             seqs.call[qseqid]['primer'] = "No"
+
+        if force_primer and seqs.call[qseqid]['primer'] == "No":  #RD
+            seqs.call[qseqid]['primer'] = "Yes"  #RD
+            primers_found.append("FORCED")  #RD
 
         seqs.info[qseqid]['primer'] = primers_found
 

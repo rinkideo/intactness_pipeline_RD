@@ -8,6 +8,7 @@ Created on Mon Mar 27 00:29:42 2017
 # pylint: disable=C0103
 # Disable module level constant name checking
 
+import argparse  #RD
 import sys
 import logging
 
@@ -30,7 +31,23 @@ logger.setLevel(logging.INFO)
 
 import os
 mod_path = os.path.dirname(os.path.abspath(__file__))
+parser = argparse.ArgumentParser(add_help=True)  #RD
+parser.add_argument('--plasmid', action='store_true',  #RD
+                    help='Plasmidsaurus run: force primer=Yes')  #RD
+parser.add_argument('--input', dest='input_fasta',  #RD
+                    help='Input FASTA file to analyze')  #RD
+args = parser.parse_args()  #RD
+
 cfg = configs(os.path.join(mod_path, 'default.cfg'))
+if args.input_fasta:  #RD
+    cfg['Main']['file_qry'] = args.input_fasta  #RD
+    cfg['Query']['file_seq'] = args.input_fasta  #RD
+    cfg['BLAST']['file_qry'] = args.input_fasta  #RD
+    input_base = os.path.splitext(os.path.basename(args.input_fasta))[0]  #RD
+    cfg['Main']['path_out'] = os.path.join(cfg['Main']['path_dat'], f"seqs_{input_base}")  #RD
+    os.makedirs(cfg['Main']['path_out'], exist_ok=True)  #RD
+if args.plasmid:  #RD
+    cfg['Primer']['plasmidsaurus_force_primer'] = '1'  #RD
 
 seqs = Sequences(cfg['Query'], cfg['Reference'])
 
