@@ -1,0 +1,10 @@
+services:
+  intactness-app:
+    image: ghcr.io/rinkideo/intactness-app:latest
+    ports:
+      - "8501:8501"
+    volumes:
+      - ../data:/opt/data
+      - ../database:/opt/database:ro
+    environment:
+      STREAMLIT_SERVER_HEADLESS: "true"

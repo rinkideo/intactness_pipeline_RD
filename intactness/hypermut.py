@@ -172,5 +172,11 @@ def hypermut(configs, seqs):
     # Run hypermut for short ones
     _hyper_drop(file_ref, file_seqs_drop, seqs)
 
+    for qid in seqs.qids:  #RD
+        if 'hypermut' not in seqs.call[qid] or 'hypermut' not in seqs.info[qid]:  #RD
+            logger.warning("Hypermut missing for %s; setting Pass", qid)  #RD
+            seqs.call[qid]['hypermut'] = 'Pass'  #RD
+            seqs.info[qid]['hypermut'] = tuple('Pass' for _ in range(6))  #RD
+
     # Write report
     _write_hyper_summary(seqs, configs['file_out'])

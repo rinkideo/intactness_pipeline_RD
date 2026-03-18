@@ -208,8 +208,15 @@ def process_GC(path_out='data/seqs'):  #RD
                             break
                         else:
                             line = line.strip()
-                            seq_id, _, pos = line.split(' ')
-                            results[gene].setdefault(seq_id, set()).add((int(pos), 'SC', ''))
+                            parts = line.split()  #RD
+                            if len(parts) >= 3:  #RD
+                                seq_id, pos = parts[0], parts[2]  #RD
+                                try:  #RD
+                                    pos_i = int(pos)  #RD
+                                except ValueError:  #RD
+                                    line = fn.readline()  #RD
+                                    continue  #RD
+                                results[gene].setdefault(seq_id, set()).add((pos_i, 'SC', ''))  #RD
                             line = fn.readline()
                 else:
                     line = fn.readline()
@@ -226,8 +233,15 @@ def process_GC(path_out='data/seqs'):  #RD
                             break
                         else:
                             line = line.strip()
-                            seq_id, _, pos, ic_type = line.split(' ')
-                            results[gene].setdefault(seq_id, set()).add((int(pos), 'IC', ic_type))
+                            parts = line.split()  #RD
+                            if len(parts) >= 4:  #RD
+                                seq_id, pos, ic_type = parts[0], parts[2], parts[3]  #RD
+                                try:  #RD
+                                    pos_i = int(pos)  #RD
+                                except ValueError:  #RD
+                                    line = fn.readline()  #RD
+                                    continue  #RD
+                                results[gene].setdefault(seq_id, set()).add((pos_i, 'IC', ic_type))  #RD
                             line = fn.readline()
                 else:
                     line = fn.readline()

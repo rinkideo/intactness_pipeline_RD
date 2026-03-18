@@ -197,6 +197,8 @@ class View:
 
             for r in self.group[g]:
                 outfile = '%s_%d.pdf' % (g, count)
+                if self.out != '':
+                    outfile = os.path.join(self.out, outfile)
                 gdd = GenomeDiagram.Diagram('Diagram of Blast Alignment')
                 self.draw_alignment(gdd, r, self.query_len[r], self.record[r])
                 gdd.write(outfile, output='pdf')
@@ -221,8 +223,8 @@ class View:
             count = 1
             for r in self.group[g]:
                 outfile = '%s_%d.pdf' % (g, count)
-                # try:
+                if self.out != '':
+                    outfile = os.path.join(self.out, outfile)
                 os.remove(outfile)
-                # except:
                 pass
                 count += 1

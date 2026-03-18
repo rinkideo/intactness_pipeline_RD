@@ -64,7 +64,7 @@ def defect(configs, seqs):
             seqs.call[qid]['defect'] = 'Pass'
             seqs.info[qid]['defect'] = ['Pass', 'Pass']
 
-    csv_path = "5prime_deletions_summary.csv"
+    csv_path = os.path.join(configs['path_out'], "5prime_deletions_summary.csv")
     with open(csv_path, 'w', newline='') as csvfile:
         fieldnames = ['sequence_id', 'deletion_type', 'start_pos', 'end_pos', 'deletion_length']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -82,7 +82,7 @@ def defect(configs, seqs):
                 'end_pos': configs['end'],
                 'deletion_length': n_del
             })
-    logger.info("Wrote 5prime_deletions_summary.csv")  #RD
+    logger.info("Wrote %s", csv_path)  #RD
     with open(configs['file_out'], 'w') as fh_o:
         print("Contig ID\tGaps\tInserts\t5' Defect", file=fh_o)
         for qid in seqs.qids:
