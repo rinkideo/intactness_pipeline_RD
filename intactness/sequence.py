@@ -35,7 +35,19 @@ def get_seqs(configs, verbose=True):
     compress = configs['compress']
 
     fh_i = get_file_handle_by_type(f_i, 'r', compress)
-    seqs = SeqIO.to_dict(SeqIO.parse(fh_i, fmt))
+    records = list(SeqIO.parse(fh_i, fmt))
+    seen_ids = set()
+    duplicate_ids = []
+    for record in records:
+        if record.id in seen_ids and record.id not in duplicate_ids:
+            duplicate_ids.append(record.id)
+        seen_ids.add(record.id)
+
+    if duplicate_ids:
+        dup_str = ', '.join(duplicate_ids)
+        raise ValueError(f"Input FASTA contains duplicate sequence headers: {dup_str}")
+
+    seqs = {record.id: record for record in records}
 
     if verbose:
         # Print length distribution

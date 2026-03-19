@@ -33,13 +33,16 @@ logger.setLevel(logging.INFO)
 import os
 mod_path = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser(add_help=True)  #RD
+parser.add_argument('--config', dest='config_file',
+                    help='Path to config file override')
 parser.add_argument('--plasmid', action='store_true',  #RD
                     help='Plasmidsaurus run: force primer=Yes')  #RD
 parser.add_argument('--input', dest='input_fasta',  #RD
                     help='Input FASTA file to analyze')  #RD
 args = parser.parse_args()  #RD
 
-cfg = configs(os.path.join(mod_path, 'default.cfg'))
+cfg_path = args.config_file if args.config_file else os.path.join(mod_path, 'default.cfg')
+cfg = configs(cfg_path)
 if args.input_fasta:  #RD
     cfg['Main']['file_qry'] = args.input_fasta  #RD
     cfg['Query']['file_seq'] = args.input_fasta  #RD

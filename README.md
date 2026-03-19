@@ -41,7 +41,6 @@ Before you start
   - `database/`
   - `intactness/`
   - The `data/` folder will be created automatically on first run if it does not already exist. This folder is for input FASTA and outputs
-4. Don't forget to update the email in `default.cfg`
 
 ### Start the app
 
@@ -64,11 +63,12 @@ run_app.bat
 The app opens automatically in your browser.
 
 ### Use the app
-1. Upload a FASTA file
-2. Select `Yes` or `No`
-3. Click `Run pipeline`
-4. Output files are created in `data/seqs_<inputname>`.
-5. Can also download the results ZIP when finished
+1. Enter your email address
+2. Upload a FASTA file
+3. Select `Yes` or `No`
+4. Click `Run pipeline`
+5. Output files are created in `data/seqs_<inputname>`.
+6. Can also download the results ZIP when finished
 
 
 ### Stop the app

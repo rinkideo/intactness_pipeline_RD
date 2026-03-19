@@ -15,6 +15,7 @@ REPO_ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = REPO_ROOT.parent
 DATABASE_DIR = PROJECT_ROOT / "database"
 DATA_DIR = PROJECT_ROOT / "data"
+DEFAULT_CFG_PATH = REPO_ROOT / "default.cfg"
 
 
 st.markdown(
@@ -66,7 +67,11 @@ def make_job_zip(output_dir: Path) -> bytes:
     return buffer.getvalue()
 
 
-def prepare_job(uploaded_file) -> dict:
+def is_valid_email(value: str) -> bool:
+    return bool(re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", value.strip()))
+
+
+def prepare_job(uploaded_file, email: str) -> dict:
     if not DATABASE_DIR.exists():
         raise RuntimeError(f"Expected reference database directory was not found: {DATABASE_DIR}")
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -77,12 +82,17 @@ def prepare_job(uploaded_file) -> dict:
 
     output_name = expected_output_dir(input_name)
     output_dir = DATA_DIR / output_name
+    cfg_path = output_dir / "default.app.cfg"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    write_runtime_config(cfg_path, email.strip())
 
     return {
         "input_name": input_name,
         "output_name": output_name,
         "output_dir": output_dir,
         "input_path": input_path,
+        "cfg_path": cfg_path,
+        "email": email.strip(),
     }
 
 
@@ -91,6 +101,8 @@ def run_pipeline(job: dict, plasmid: bool, log_placeholder, status_placeholder) 
         sys.executable,
         "-m",
         "intactness",
+        "--config",
+        str(job["cfg_path"]),
         "--input",
         f"data/{job['input_name']}",
     ]
@@ -157,6 +169,19 @@ def display_path(path: Path) -> str:
         return str(path)
 
 
+def write_runtime_config(cfg_path: Path, email: str) -> None:
+    config_text = DEFAULT_CFG_PATH.read_text()
+    updated_text, count = re.subn(
+        r"(?m)^email\s*=\s*.*$",
+        f"email                   = {email}",
+        config_text,
+        count=1,
+    )
+    if count != 1:
+        raise RuntimeError("Could not update email in default.cfg for app run.")
+    cfg_path.write_text(updated_text)
+
+
 st.set_page_config(page_title="Intactness Pipeline", layout="wide")
 
 st.title("Intactness Pipeline")
@@ -165,6 +190,11 @@ st.caption("Local run mode. Uses the standard project `data/` folder and existin
 control_col, status_col = st.columns([1.1, 0.9])
 
 with control_col:
+    email_value = st.text_input(
+        "Email address",
+        help="Required for GeneCutter submission.",
+        placeholder="your_email@example.com",
+    )
     uploaded_file = st.file_uploader(
         "FASTA input",
         type=["fa", "fasta", "fna"],
@@ -182,13 +212,13 @@ with status_col:
 if "last_run" not in st.session_state:
     st.session_state.last_run = None
 
-run_disabled = uploaded_file is None or plasmid_choice is None
+run_disabled = uploaded_file is None or plasmid_choice is None or not is_valid_email(email_value)
 
 if st.button("Run pipeline", type="primary", disabled=run_disabled):
     try:
-        job = prepare_job(uploaded_file)
+        job = prepare_job(uploaded_file, email_value)
         st.success(f"Running `{job['input_name']}`")
-        path_col1, path_col2 = st.columns(2)
+        path_col1, path_col2, path_col3 = st.columns(3)
         path_col1.text_input(
             "Input file",
             value=display_path(job["input_path"]),
@@ -200,6 +230,12 @@ if st.button("Run pipeline", type="primary", disabled=run_disabled):
             value=display_path(job["output_dir"]),
             disabled=True,
             key="active_output_directory",
+        )
+        path_col3.text_input(
+            "Email",
+            value=job["email"],
+            disabled=True,
+            key="active_email",
         )
 
         live_col, status_col = st.columns([1.4, 1])
