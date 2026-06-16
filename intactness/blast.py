@@ -6,7 +6,10 @@ Various alignment utilities
 
 import logging
 import sys
+from copy import deepcopy  ##RD
 from math import inf
+
+from Bio import SeqIO  ##RD
 
 from .utils import run_cmd
 
@@ -257,6 +260,7 @@ def _prepare_qseqs(seqs, file_keep, file_keep_plus_ref, file_drop):
     qids_keep_fwd = set()
     qids_keep_rev = set()
     qids_drop = set()
+    qids_drop_del_rev = set()  ##RD
     for qid in seqs.qids:
         _, _, _, aln_strand = seqs.info[qid]['blast']
         if all([seqs.call[qid]['is_hiv'] == 'Yes',
@@ -269,6 +273,8 @@ def _prepare_qseqs(seqs, file_keep, file_keep_plus_ref, file_drop):
                 qids_keep_rev.add(qid)
         else:
             qids_drop.add(qid)
+            if seqs.call[qid]['deletion'] == 'Yes' and aln_strand == 'minus':  ##RD
+                qids_drop_del_rev.add(qid)  ##RD
 
     msg = 'No. of seqs with forward mapping: {}'.format(len(qids_keep_fwd))
     logger.info(msg)
@@ -276,6 +282,9 @@ def _prepare_qseqs(seqs, file_keep, file_keep_plus_ref, file_drop):
     logger.info(msg)
     msg = 'No. of seqs with Non-HIV/Del/Inv: {}'.format(len(qids_drop))
     logger.info(msg)
+    if qids_drop_del_rev:  ##RD
+        msg = 'Reverse-complemented large-deletion drop seqs: {}'.format(', '.join(sorted(qids_drop_del_rev)))  ##RD
+        logger.info(msg)  ##RD
 
     #if len(qids_keep_fwd) + len(qids_keep_rev) == 0:
     #    print('No sequence remained. Program was terminated!')
@@ -288,7 +297,15 @@ def _prepare_qseqs(seqs, file_keep, file_keep_plus_ref, file_drop):
     qids_drop = set(seqs.qids) - qids_keep
     seqs.write(file_keep, qids_keep)
     seqs.write(file_keep_plus_ref, qids_keep, prepend_ref=True)
-    seqs.write(file_drop, qids_drop)
+    records_drop = []  ##RD
+    for qid in qids_drop:  ##RD
+        record = seqs.qry[qid]  ##RD
+        # ##RD Stored seqs.qry[qid] remains unchanged; only the drop-file copy is flipped.  ##RD
+        if qid in qids_drop_del_rev:  ##RD
+            record = deepcopy(record)  ##RD
+            record.seq = record.seq.reverse_complement()  ##RD
+        records_drop.append(record)  ##RD
+    SeqIO.write(records_drop, file_drop, 'fasta')  ##RD
 
 
 def _prepare_del(seqs, file_del):
