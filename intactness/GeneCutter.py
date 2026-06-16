@@ -28,9 +28,24 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logger = logging.getLogger('pipe.GeneCutter')
 
 URL_BASE = "https://www.hiv.lanl.gov/"
+REQUEST_TIMEOUT = 60  # seconds
 
 def sleep_btw(early, late):
     time.sleep(randrange(early, late))
+
+def retry_request(action, description, attempts=5):
+    for attempt in range(1, attempts + 1):
+        try:
+            return action()
+        except requests.exceptions.RequestException as exc:
+            logger.warning(
+                "%s failed on attempt %s/%s: %s",
+                description, attempt, attempts, exc,
+            )
+            if attempt == attempts:
+                raise
+            print(f"❌ {description} failed. Retrying after wait... ({exc})")
+            time.sleep(60)
 
 def submit_GC(email_address, path_out='data/seqs'):  #RD
     """
@@ -44,7 +59,10 @@ def submit_GC(email_address, path_out='data/seqs'):  #RD
 
     # Open website
     url_gene_cutter = URL_BASE + "content/sequence/GENE_CUTTER/cutter.html"
-    br.open(url_gene_cutter, verify = False)
+    retry_request(
+        lambda: br.open(url_gene_cutter, verify=False, timeout=REQUEST_TIMEOUT),
+        "Gene Cutter website open",
+    )
 
     logger.info('Opening Gene Cutter website')
     sleep_btw(0, 5)
@@ -60,7 +78,10 @@ def submit_GC(email_address, path_out='data/seqs'):  #RD
     br.session.verify = False
     with open(upload_path, 'rb') as fh_upload:  #RD
         br['UPLOAD'] = fh_upload  #RD
-        response = br.submit_selected(verify=False)
+        response = retry_request(
+            lambda: br.submit_selected(verify=False, timeout=REQUEST_TIMEOUT),
+            "Gene Cutter upload",
+        )
 
     logger.info('Uploading sequences to Gene Cutter')
     sleep_btw(0, 5)
@@ -73,7 +94,10 @@ def submit_GC(email_address, path_out='data/seqs'):  #RD
     br['titleFromUser'] = 'PSC ' + datetime.now().strftime("%Y-%m-%d %H:%M")
     br['EMAIL'] = email_address
     br['EMAIL2'] = email_address
-    response = br.submit_selected()
+    response = retry_request(
+        lambda: br.submit_selected(timeout=REQUEST_TIMEOUT),
+        "Gene Cutter submission",
+    )
 
     logger.info('Submitting job to Gene Cutter')
     sleep_btw(0, 5)
@@ -139,9 +163,15 @@ def submit_GC(email_address, path_out='data/seqs'):  #RD
     while True:
         sleep_btw(60, 61)
         try:
-            response = br.get(url_download, verify=False)
+            response = br.get(url_download, verify=False, timeout=REQUEST_TIMEOUT)
         except requests.exceptions.TooManyRedirects:  #RD
             print("❌ Too many redirects. Retrying after wait...")  #RD
+            logger.warning("Too many redirects while downloading Gene Cutter output. Retrying.")
+            time.sleep(60)  #RD
+            continue  #RD
+        except requests.exceptions.RequestException as exc:  #RD
+            print(f"❌ Gene Cutter download connection failed. Retrying after wait... ({exc})")  #RD
+            logger.warning("Gene Cutter download failed: %s. Retrying.", exc)
             time.sleep(60)  #RD
             continue  #RD
     
@@ -170,7 +200,7 @@ def submit_GC(email_address, path_out='data/seqs'):  #RD
             os.rename(os.path.join(path_out, 'genecutter'), dst_path)  #RD
             os.mkdir(os.path.join(path_out, 'Gene_Cutter', 'indv_reports'))  #RD
     
-            response = br.get(url_all, verify=False)
+            response = br.get(url_all, verify=False, timeout=REQUEST_TIMEOUT)
             with open(os.path.join(path_out, 'Gene_Cutter', 'ALL.AA.PRINT'), 'w') as out:  #RD
                 content = re.sub(r'<br>', '\n', response.content.decode())
                 content = re.sub(r'<.*?>', '', content)
