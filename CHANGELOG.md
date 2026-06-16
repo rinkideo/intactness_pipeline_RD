@@ -21,3 +21,5 @@ Forked from upstream release v0.0.1
 - Improved duplicate FASTA header validation with a clear error message listing duplicated sequence names.
 - Fixed containerized output path issues for alignment view PDFs and 5' deletion summary output.
 - Updated app Docker packaging to use the current pipeline code inside the container.
+- Published the app image as multi-architecture (linux/amd64 + linux/arm64) so lab members on Intel/Windows/Linux and Apple Silicon can all pull and run it.
+
